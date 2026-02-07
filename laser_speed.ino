@@ -1,6 +1,6 @@
 const int start = 20;
 const int stop = 21;
-const int pulse = 4;  // ICP1
+const int pulse = 19;
 
 void setup() {
   // put your setup code here, to run once:
@@ -10,31 +10,31 @@ void setup() {
 
   Serial.begin(9600); // Pro micro ignores baud rate
 
-  // Enable input capture with noise canceler
-  TCCR1B |= bit(ICNC1) || bit(ICES1);
-
-  // // Connect the ICP pin as the capture source
-  ACSR &= ~bit(ACIC);
+  Serial.println("t0,t1,dt,N");
 }
 
 void loop() {
   unsigned long pulses = 0;
+  byte high_count = 0;
+  byte last_pulse_value = 0, pulse_value;
 
   while(!digitalRead(start));
   const unsigned long t0 = micros();
-  TIFR1 |= bit(ICF1);
 
   while(!digitalRead(stop)) {
-    if(!(TIFR1 & bit(ICF1))) {
-      TIFR1 |= bit(ICF1);
-      ++pulses;
-    }
+    pulse_value = digitalRead(pulse);
+    pulse_value &= digitalRead(pulse);
+
+    if(pulse_value && !last_pulse_value) ++pulses;
+
+    last_pulse_value = pulse_value;
   }
 
   const unsigned long t1 = micros();
+  const unsigned long dt = t1 - t0;
 
-  Serial.print("t0: "); Serial.println(t0);
-  Serial.print("t1: "); Serial.println(t1);
-  Serial.print("dt: "); Serial.println(t1 - t0);
-  Serial.print("N:  "); Serial.println(pulses);
+  Serial.print(t0); Serial.print(",");
+  Serial.print(t1); Serial.print(",");
+  Serial.print(dt); Serial.print(",");
+  Serial.print(pulses); Serial.println();
 }
