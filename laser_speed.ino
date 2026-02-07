@@ -1,6 +1,6 @@
-const int start = 20;
-const int stop = 21;
-const int pulse = 19;
+const int start = 20; // PF5
+const int stop = 21;  // PF4
+const int pulse = 19; // PF6
 
 void setup() {
   // put your setup code here, to run once:
@@ -13,23 +13,34 @@ void setup() {
   Serial.println("t0,t1,dt,N");
 }
 
+// PF 4, 5, 6
+#define START (PINF & bit(5))
+#define READ_PINF (pinf = PINF)
+#define STOP (pinf & bit(4))
+#define PULSE (pinf & bit(6))
+
 void loop() {
   unsigned long pulses = 0;
   byte high_count = 0;
-  byte last_pulse_value = 0, pulse_value;
+  byte pinf;
 
-  while(!digitalRead(start));
+  while(!START);
   const unsigned long t0 = micros();
 
-  while(!digitalRead(stop)) {
-    pulse_value = digitalRead(pulse);
-    pulse_value &= digitalRead(pulse);
+  while(1) {
+    READ_PINF;
+    if(STOP) break;
 
-    if(pulse_value && !last_pulse_value) ++pulses;
+    if(PULSE) {
+      READ_PINF;
+      if(STOP) break;
 
-    last_pulse_value = pulse_value;
+      if(PULSE) ++pulses;
+
+      while(READ_PINF && !STOP && PULSE);
+      if(STOP) break;
+    }
   }
-
   const unsigned long t1 = micros();
   const unsigned long dt = t1 - t0;
 
