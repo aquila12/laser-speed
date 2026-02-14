@@ -10,6 +10,7 @@ void setup() {
   pinMode(pulse, INPUT);
 
   Serial.begin(9600); // Pro micro ignores baud rate
+  while(!Serial);     // Wait for serial to be ready (why not in Serial.begin Arduino, huh?)
 
   Serial.println("t0,t1,dt,N");
 }
@@ -25,8 +26,12 @@ void loop() {
   byte high_count = 0;
   byte pinf;
 
+  // Serial.println("WAIT");
+
   while(!START);
   const unsigned long t0 = micros();
+
+  // Serial.println("START");
 
   while(1) {
     READ_PINF;
@@ -44,6 +49,8 @@ void loop() {
   }
   const unsigned long t1 = micros();
   const unsigned long dt = t1 - t0;
+
+  // Serial.println("STOP");
 
   Serial.print(t0); Serial.print(",");
   Serial.print(t1); Serial.print(",");
