@@ -1,11 +1,12 @@
 const int start = 20; // PF5
 const int stop = 21;  // PF4
-const int pulse = 19; // PF6
+const int pulse = 18; // PF7
 
 void setup() {
   // put your setup code here, to run once:
   pinMode(start, INPUT);
   pinMode(stop, INPUT);
+  pinMode(19, OUTPUT);  // Shielding
   pinMode(pulse, INPUT);
 
   Serial.begin(9600); // Pro micro ignores baud rate
@@ -18,7 +19,7 @@ void setup() {
 #define START (PINF & bit(5))
 #define READ_PINF (pinf = PINF)
 #define STOP (!(pinf & bit(5)))
-#define PULSE (pinf & bit(6))
+#define PULSE (pinf & bit(7))
 
 void loop() {
   unsigned long pulses = 0;
