@@ -16,7 +16,7 @@ void setup() {
 // PF 4, 5, 6
 #define START (PINF & bit(5))
 #define READ_PINF (pinf = PINF)
-#define STOP (!pinf & bit(5))
+#define STOP (!(pinf & bit(5)))
 #define PULSE (pinf & bit(6))
 
 void loop() {
